@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import toast from 'react-hot-toast'
 import Ripple from '../components/ui/Ripple'
-import usePullToRefresh from '../hooks/usePullToRefresh'
 
 const WishlistPage = () => {
   const { wishlist, removeFromWishlist } = useWishlist()
@@ -55,13 +54,6 @@ const WishlistPage = () => {
     }
   }
 
-  // Pull to Refresh - Refresh wishlist
-  const refreshWishlist = () => {
-    toast.success('Wishlist refreshed! 🔄')
-  }
-
-  const { isPulling, pullDistance } = usePullToRefresh(refreshWishlist, 100)
-
   // Empty state
   if (wishlist.length === 0) {
     return (
@@ -98,29 +90,7 @@ const WishlistPage = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="container-custom py-12"
-    >
-      {/* Pull to Refresh Indicator */}
-      {isPulling && (
-        <div className="flex justify-center items-center py-3 text-primary-600 dark:text-primary-400">
-          <svg 
-            className={`w-5 h-5 transition-transform duration-200 ${pullDistance > 80 ? 'rotate-180' : ''}`}
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M19 13l-7 7-7-7m7-7v14" 
-            />
-          </svg>
-          <span className="ml-2 text-sm font-medium">
-            {pullDistance > 80 ? 'Release to refresh' : 'Pull to refresh'}
-          </span>
-        </div>
-      )}
-
+>
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div>

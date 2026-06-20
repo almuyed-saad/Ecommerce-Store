@@ -4,7 +4,6 @@ import { products } from '../data/products'
 import ProductCard from '../components/shop/ProductCard'
 import ProductSkeleton from '../components/shop/ProductSkeleton'
 import { motion, AnimatePresence } from 'framer-motion'
-import usePullToRefresh from '../hooks/usePullToRefresh'
 import toast from 'react-hot-toast'
 
 const ShopPage = () => {
@@ -78,19 +77,6 @@ const ShopPage = () => {
   const startIndex = (currentPage - 1) * productsPerPage
   const currentProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage)
 
-  // Pull to Refresh - Refresh products
-  const refreshProducts = () => {
-    setLoading(true)
-    // Simulate refresh
-    setTimeout(() => {
-      setFilteredProducts(products)
-      setLoading(false)
-      toast.success('Products refreshed! 🔄')
-    }, 1000)
-  }
-
-  const { isPulling, pullDistance } = usePullToRefresh(refreshProducts, 100)
-
   // Handle category selection
   const handleCategorySelect = (category) => {
     setSelectedCategory(category)
@@ -116,28 +102,6 @@ const ShopPage = () => {
 
   return (
     <div className="container-custom py-8">
-      {/* Pull to Refresh Indicator */}
-      {isPulling && (
-        <div className="flex justify-center items-center py-3 text-primary-600 dark:text-primary-400">
-          <svg 
-            className={`w-5 h-5 transition-transform duration-200 ${pullDistance > 80 ? 'rotate-180' : ''}`}
-            fill="none" 
-            viewBox="0 0 24 24" 
-            stroke="currentColor"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M19 13l-7 7-7-7m7-7v14" 
-            />
-          </svg>
-          <span className="ml-2 text-sm font-medium">
-            {pullDistance > 80 ? 'Release to refresh' : 'Pull to refresh'}
-          </span>
-        </div>
-      )}
-
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-dark-bg dark:text-white">
