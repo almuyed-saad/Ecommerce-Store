@@ -6,5 +6,10 @@
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "VITE_API_URL": "https://ecommerce-store-6dlf.onrender.com/api"
+    }
+  }
 }
