@@ -147,48 +147,55 @@ const CartPage = () => {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        {/* Quantity Controls with Ripple */}
-                        <div className="flex items-center gap-1 bg-light-surface dark:bg-dark-card rounded-full p-1">
-                          <Ripple 
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold text-dark-bg dark:text-white hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-300 hover:text-red-500 hover:scale-110"
-                            onClick={() => {
-                              if (item.quantity <= 1) {
-                                removeFromCart(item.id)
-                              } else {
-                                updateQuantity(item.id, item.quantity - 1)
-                              }
-                            }}
-                            rippleColor="rgba(239,68,68,0.3)"
-                          >
-                            −
-                          </Ripple>
-                          
-                          <span className="w-8 text-center font-semibold text-dark-bg dark:text-white">
-                            {item.quantity}
-                          </span>
-                          
-                          <Ripple 
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold text-dark-bg dark:text-white hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-all duration-300 hover:text-primary-600 hover:scale-110"
-                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                            rippleColor="rgba(124,58,237,0.3)"
-                          >
-                            +
-                          </Ripple>
-                        </div>
+{/* Quantity Controls with Ripple */}
+<div className="flex items-center gap-1 bg-light-surface dark:bg-dark-card rounded-full p-1">
+  <Ripple 
+    className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold text-dark-bg dark:text-white hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-300 hover:text-red-500 hover:scale-110 select-none cursor-pointer"
+    onClick={() => {
+      const id = item._id || item.id
+      if (item.quantity <= 1) {
+        removeFromCart(id)
+      } else {
+        updateQuantity(id, item.quantity - 1)
+      }
+    }}
+    rippleColor="rgba(239,68,68,0.3)"
+  >
+    −
+  </Ripple>
+  
+  <span className="w-8 text-center font-semibold text-dark-bg dark:text-white select-none">
+    {item.quantity}
+  </span>
+  
+  <Ripple 
+    className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold text-dark-bg dark:text-white hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-all duration-300 hover:text-primary-600 hover:scale-110 select-none cursor-pointer"
+    onClick={() => {
+      const id = item._id || item.id
+      updateQuantity(id, item.quantity + 1)
+    }}
+    rippleColor="rgba(124,58,237,0.3)"
+  >
+    +
+  </Ripple>
+</div>
 
-                        {/* Subtotal */}
-                        <span className="text-sm font-semibold text-dark-bg dark:text-white min-w-[60px] text-right">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </span>
+{/* Subtotal */}
+<span className="text-sm font-semibold text-dark-bg dark:text-white min-w-[60px] text-right select-none">
+  ${(item.price * item.quantity).toFixed(2)}
+</span>
 
-                        {/* Remove with Ripple */}
-                        <Ripple 
-                          className="text-red-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 p-2 rounded-full hover:scale-110"
-                          onClick={() => removeFromCart(item.id)}
-                          rippleColor="rgba(239,68,68,0.3)"
-                        >
-                          ✕
-                        </Ripple>
+{/* Remove with Ripple */}
+<Ripple 
+  className="text-red-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 p-2 rounded-full hover:scale-110 select-none cursor-pointer"
+  onClick={() => {
+    const id = item._id || item.id
+    removeFromCart(id)
+  }}
+  rippleColor="rgba(239,68,68,0.3)"
+>
+  ✕
+</Ripple>
                       </div>
                     </div>
                   </div>

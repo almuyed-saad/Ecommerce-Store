@@ -1,29 +1,13 @@
-import { useState, useEffect } from 'react'
-import { fetchAllProducts } from '../../services/productService'
-import ProductCard from '../shop/ProductCard'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import ProductCard from '../shop/ProductCard'
+import ProductSkeleton from '../shop/ProductSkeleton'
 
-const FeaturedProducts = () => {
-  const [products, setProducts] = useState([])
-  const [loading, setLoading] = useState(true)
+const FeaturedProducts = ({ products, loading }) => {
   const [activeCategory, setActiveCategory] = useState('all')
 
-  const categories = [
-    'all',
-    "Men's Fashion",
-    "Women's Fashion",
-    "Jewelry"
-  ]
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      const data = await fetchAllProducts()
-      setProducts(data)
-      setLoading(false)
-    }
-    loadProducts()
-  }, [])
+  const categories = ['all', "Men's Fashion", "Women's Fashion", 'Jewelry']
 
   const filteredProducts = activeCategory === 'all'
     ? products
@@ -38,6 +22,11 @@ const FeaturedProducts = () => {
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-dark-bg dark:text-white">Loading products...</h2>
           </div>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <ProductSkeleton key={i} />
+            ))}
+          </div>
         </div>
       </section>
     )
@@ -46,12 +35,11 @@ const FeaturedProducts = () => {
   return (
     <section className="py-16 bg-light-surface dark:bg-dark-surface">
       <div className="container-custom">
-        {/* Section Header */}
         <div className="text-center mb-12">
           <span className="text-secondary-500 font-semibold text-sm tracking-wider uppercase flex items-center justify-center gap-2">
-            <span className="w-8 h-0.5 bg-secondary-500"></span>
+            <span className="w-8 h-0.5 bg-secondary-500" />
             Featured Collection
-            <span className="w-8 h-0.5 bg-secondary-500"></span>
+            <span className="w-8 h-0.5 bg-secondary-500" />
           </span>
           <h2 className="text-3xl md:text-4xl font-bold text-dark-bg dark:text-white mt-2">
             Best Sellers 🔥
@@ -61,7 +49,6 @@ const FeaturedProducts = () => {
           </p>
         </div>
 
-        {/* Category Tabs */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
           {categories.map((cat) => (
             <button
@@ -78,38 +65,28 @@ const FeaturedProducts = () => {
           ))}
         </div>
 
-        {/* Animated Product Grid */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeCategory}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.4, ease: 'easeInOut' }}
+            transition={{ duration: 0.3 }}
             className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6"
           >
-            {displayProducts.length > 0 ? (
-              displayProducts.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
-                >
-                  <ProductCard product={product} />
-                </motion.div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12">
-                <p className="text-light-text-secondary dark:text-dark-text-secondary">
-                  No products found in this category.
-                </p>
-              </div>
-            )}
+            {displayProducts.map((product, index) => (
+              <motion.div
+                key={product._id || product.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
           </motion.div>
         </AnimatePresence>
 
-        {/* View All Button */}
         <div className="text-center mt-10">
           <Link to="/shop">
             <button className="px-8 py-3 border-2 border-primary-600 text-primary-600 dark:text-primary-400 dark:border-primary-400 rounded-full font-semibold hover:bg-primary-600 hover:text-white dark:hover:bg-primary-400 dark:hover:text-dark-bg transition-all">

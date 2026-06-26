@@ -1,6 +1,7 @@
+// src/pages/ShopPage.jsx
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { products } from '../data/products'
+import { fetchProducts } from '../services/productService'
 import ProductCard from '../components/shop/ProductCard'
 import ProductSkeleton from '../components/shop/ProductSkeleton'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -9,8 +10,8 @@ import toast from 'react-hot-toast'
 const ShopPage = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   
-  const [allProducts] = useState(products)
-  const [filteredProducts, setFilteredProducts] = useState(products)
+  const [allProducts, setAllProducts] = useState([])
+  const [filteredProducts, setFilteredProducts] = useState([])
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedCategory, setSelectedCategory] = useState(() => {
     return searchParams.get('category') || 'all'
@@ -21,16 +22,21 @@ const ShopPage = () => {
   
   const productsPerPage = 12
 
-  // Get unique categories
-  const categories = ['all', ...new Set(products.map(p => p.category))]
-
-  // Simulate loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  // Fetch products from backend
+useEffect(() => {
+  const loadProducts = async () => {
+    setLoading(true)
+    const data = await fetchProducts()
+    setAllProducts(data)
+    // Delay to show skeletons
+    setTimeout(() => {
       setLoading(false)
-    }, 1000)
-    return () => clearTimeout(timer)
-  }, [])
+    }, 800)
+  }
+  loadProducts()
+}, [])
+  // Get unique categories
+  const categories = ['all', ...new Set(allProducts.map(p => p.category))]
 
   // Sync category with URL
   useEffect(() => {
@@ -54,6 +60,10 @@ const ShopPage = () => {
       )
     }
 
+     if (selectedCategory !== 'all') {
+    result = result.filter(p => p.category === selectedCategory)
+    }
+
     switch (sortBy) {
       case 'price-low':
         result.sort((a, b) => a.price - b.price)
@@ -62,7 +72,7 @@ const ShopPage = () => {
         result.sort((a, b) => b.price - a.price)
         break
       case 'rating':
-        result.sort((a, b) => b.rating.rate - a.rating.rate)
+        result.sort((a, b) => b.rating?.rate - a.rating?.rate)
         break
       default:
         break
@@ -200,7 +210,7 @@ const ShopPage = () => {
         ))}
       </div>
 
-      {/* Product Grid - WITH SKELETONS */}
+      {/* Product Grid */}
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
           {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
@@ -213,7 +223,7 @@ const ShopPage = () => {
             <AnimatePresence>
               {currentProducts.map((product, index) => (
                 <motion.div
-                  key={product.id}
+                  key={product._id || product.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -20 }}

@@ -1,40 +1,39 @@
-import { products } from '../data/products'
+// src/services/productService.js
+import apiClient from '../api/client'
 
-// Fetch all products from local data
-export const fetchAllProducts = async () => {
-  return products
+// Fetch all products from backend
+export const fetchProducts = async () => {
+  try {
+    const response = await apiClient.get('/products')
+    console.log('Products fetched:', response.data)
+    return response.data
+  } catch (error) {
+    console.error('Error fetching products:', error)
+    return []
+  }
 }
 
-// Fetch single product by ID from local data
+// Fetch single product by ID
 export const fetchProductById = async (id) => {
-  const product = products.find(p => p.id === parseInt(id))
-  if (!product) {
-    console.error('Product not found:', id)
+  try {
+    const response = await apiClient.get(`/products/${id}`)
+    return response.data
+  } catch (error) {
+    console.error('Error fetching product:', error)
     return null
   }
-  return product
 }
 
-// Fetch products by category from local data
-export const fetchProductsByCategory = async (category) => {
-  if (category === 'all') return products
-  return products.filter(p => p.category === category)
-}
-
-// Fetch related products from local data
+// Fetch related products (same category, different ID)
 export const fetchRelatedProducts = async (category, productId) => {
-  return products
-    .filter(p => p.category === category && p.id !== parseInt(productId))
-    .slice(0, 4)
-}
-
-// Fetch all categories from local data
-export const fetchCategories = async () => {
-  return [...new Set(products.map(p => p.category))]
-}
-
-// Get product brand (now part of product data)
-export const getProductBrand = (productId) => {
-  const product = products.find(p => p.id === parseInt(productId))
-  return product?.brand || 'Premium Brand'
+  try {
+    const response = await apiClient.get('/products')
+    const allProducts = response.data
+    return allProducts
+      .filter(p => p.category === category && p._id !== productId)
+      .slice(0, 4)
+  } catch (error) {
+    console.error('Error fetching related products:', error)
+    return []
+  }
 }

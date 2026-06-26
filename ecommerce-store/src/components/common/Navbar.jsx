@@ -5,6 +5,8 @@ import { useCart } from '../../context/CartContext'
 import { useWishlist } from '../../context/WishlistContext'
 import { motion, AnimatePresence } from 'framer-motion'
 import SearchModal from './SearchModal'
+import { useAuth } from '../../context/AuthContext'
+import UserDropdown from './UserDropdown'
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -14,6 +16,7 @@ const Navbar = () => {
   const { getTotalItems } = useCart()
   const { wishlist } = useWishlist()
   const location = useLocation()
+  const { user, logout } = useAuth()
 
   // Detect scroll for glass effect
   useEffect(() => {
@@ -77,7 +80,7 @@ const Navbar = () => {
             </div>
 
             {/* Right Actions */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               {/* Search */}
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -137,6 +140,26 @@ const Navbar = () => {
                   )}
                 </AnimatePresence>
               </Link>
+
+{/* Auth Buttons */}
+{user ? (
+  <UserDropdown />
+) : (
+  <div className="flex items-center gap-3 ml-2">
+    <Link
+      to="/login"
+      className="text-sm font-medium text-primary-600 dark:text-primary-400 hover:underline transition-colors"
+    >
+      Login
+    </Link>
+    <Link
+      to="/register"
+      className="text-sm font-medium bg-primary-600 text-white px-4 py-2 rounded-full hover:bg-primary-700 transition-colors"
+    >
+      Sign Up
+    </Link>
+  </div>
+)}
 
               {/* Mobile Menu Toggle */}
               <button

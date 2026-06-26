@@ -1,16 +1,22 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { products } from '../../data/products'
+import { fetchProducts } from '../../services/productService'
 
 const SearchModal = ({ isOpen, onClose }) => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [products, setProducts] = useState([])
   const [results, setResults] = useState([])
   const inputRef = useRef(null)
 
-  // Focus input when modal opens
+  // Load products when modal opens
   useEffect(() => {
     if (isOpen) {
+      const loadProducts = async () => {
+        const data = await fetchProducts()
+        setProducts(data)
+      }
+      loadProducts()
       setTimeout(() => inputRef.current?.focus(), 100)
     }
   }, [isOpen])
@@ -26,7 +32,7 @@ const SearchModal = ({ isOpen, onClose }) => {
       product.title.toLowerCase().includes(searchTerm.toLowerCase())
     )
     setResults(filtered)
-  }, [searchTerm])
+  }, [searchTerm, products])
 
   // Close on Escape key
   useEffect(() => {
@@ -102,48 +108,51 @@ const SearchModal = ({ isOpen, onClose }) => {
                   <p className="text-sm text-gray-400 px-2">
                     Found {results.length} {results.length === 1 ? 'product' : 'products'}
                   </p>
-                  {results.map((product) => (
-                    <motion.div
-                      key={product.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.15 }}
-                    >
-                      <Link
-                        to={`/product/${product.id}`}
-                        onClick={onClose}
-                        className="flex items-center gap-4 p-4 bg-white dark:bg-dark-surface rounded-xl hover:bg-light-surface dark:hover:bg-dark-card transition-all group border border-light-border dark:border-dark-border hover:border-primary-500 dark:hover:border-primary-500"
+                  {results.map((product) => {
+                    const productId = product._id || product.id
+                    return (
+                      <motion.div
+                        key={productId}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.15 }}
                       >
-                        <img
-                          src={product.image}
-                          alt={product.title}
-                          className="w-16 h-16 object-contain bg-light-surface dark:bg-dark-card rounded-lg p-2"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-dark-bg dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
-                            {product.title}
-                          </h4>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            <div className="flex text-yellow-400 text-xs">
-                              {'★'.repeat(Math.round(product.rating?.rate || 0))}
-                              {'☆'.repeat(5 - Math.round(product.rating?.rate || 0))}
+                        <Link
+                          to={`/product/${productId}`}
+                          onClick={onClose}
+                          className="flex items-center gap-4 p-4 bg-white dark:bg-dark-surface rounded-xl hover:bg-light-surface dark:hover:bg-dark-card transition-all group border border-light-border dark:border-dark-border hover:border-primary-500 dark:hover:border-primary-500"
+                        >
+                          <img
+                            src={product.image}
+                            alt={product.title}
+                            className="w-16 h-16 object-contain bg-light-surface dark:bg-dark-card rounded-lg p-2"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-dark-bg dark:text-white group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                              {product.title}
+                            </h4>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <div className="flex text-yellow-400 text-xs">
+                                {'★'.repeat(Math.round(product.rating?.rate || 0))}
+                                {'☆'.repeat(5 - Math.round(product.rating?.rate || 0))}
+                              </div>
+                              <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
+                                ({product.rating?.count || 0})
+                              </span>
                             </div>
-                            <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                              ({product.rating?.count || 0})
+                          </div>
+                          <div className="text-right">
+                            <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                              ${product.price}
+                            </span>
+                            <span className="block text-xs text-light-text-secondary dark:text-dark-text-secondary">
+                              {product.category}
                             </span>
                           </div>
-                        </div>
-                        <div className="text-right">
-                          <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                            ${product.price}
-                          </span>
-                          <span className="block text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                            {product.category}
-                          </span>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  ))}
+                        </Link>
+                      </motion.div>
+                    )
+                  })}
                 </div>
               )}
             </div>

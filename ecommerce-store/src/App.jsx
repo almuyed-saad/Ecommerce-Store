@@ -13,7 +13,12 @@ import AboutPage from './pages/AboutPage'
 import WishlistPage from './pages/WishlistPage'
 import NotFoundPage from './pages/NotFoundPage'
 import ContactPage from './pages/ContactPage'
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage'
+import ProtectedRoute from './components/auth/ProtectedRoute'
 import CheckoutPage from './pages/CheckoutPage'
+import ProfilePage from './pages/ProfilePage'
+import { AuthProvider } from './context/AuthContext'
 import './App.css'
 
 // Wrapper component for page transitions
@@ -37,8 +42,9 @@ function App() {
     <ThemeProvider>
       <CartProvider>
         <WishlistProvider>
-          <Layout>
-            <Toaster 
+          <AuthProvider>
+           <Layout>
+             <Toaster 
               position="top-right"
               toastOptions={{
                 duration: 3000,
@@ -78,6 +84,50 @@ function App() {
     <CheckoutPage />
   </PageTransition>
 }/>
+                // Add route:
+<Route path="/profile" element={
+  <ProtectedRoute>
+    <PageTransition>
+      <ProfilePage />
+    </PageTransition>
+  </ProtectedRoute>
+} />
+
+                <Route path="/login" element={
+  <PageTransition>
+    <LoginPage />
+  </PageTransition>
+} />
+<Route path="/register" element={
+  <PageTransition>
+    <RegisterPage />
+  </PageTransition>
+} />
+
+// Protect Cart, Wishlist, Checkout:
+<Route path="/cart" element={
+  <ProtectedRoute>
+    <PageTransition>
+      <CartPage />
+    </PageTransition>
+  </ProtectedRoute>
+} />
+<Route path="/wishlist" element={
+  <ProtectedRoute>
+    <PageTransition>
+      <WishlistPage />
+    </PageTransition>
+  </ProtectedRoute>
+} />
+<Route path="/checkout" element={
+  <ProtectedRoute>
+    <PageTransition>
+      <CheckoutPage />
+    </PageTransition>
+  </ProtectedRoute>
+} />
+
+
 
                 <Route path="/cart" element={
                   <PageTransition>
@@ -102,6 +152,8 @@ function App() {
               </Routes>
             </AnimatePresence>
           </Layout>
+          </AuthProvider>
+
         </WishlistProvider>
       </CartProvider>
     </ThemeProvider>
