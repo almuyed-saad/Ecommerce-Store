@@ -13,28 +13,21 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
-// Add this line with other routes
-app.use('/api/auth', require('./routes/auth'));
 
 // Routes
 app.use('/api/products', require('./routes/products'));
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/users', require('./routes/users'));
+app.use('/api/orders', require('./routes/orders'));
+app.use('/api/cart', require('./routes/cart'));        // ✅ ADD THIS
+app.use('/api/wishlist', require('./routes/wishlist')); // ✅ ADD THIS
 
-// MongoDB Connection with DNS fix
-const connectDB = async () => {
-  try {
-    await mongoose.connect(process.env.MONGO_URI, {
-      dbName: 'ecommerce',
-      serverSelectionTimeoutMS: 5000,
-    });
-    console.log('✅ Connected to MongoDB');
-  } catch (error) {
-    console.error('❌ MongoDB connection error:', error.message);
-    // Retry after 5 seconds
-    setTimeout(connectDB, 5000);
-  }
-};
-
-connectDB();
+// MongoDB Connection
+mongoose.connect(process.env.MONGO_URI, {
+  dbName: 'ecommerce'
+})
+.then(() => console.log('✅ Connected to MongoDB'))
+.catch((err) => console.error('❌ MongoDB connection error:', err));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
