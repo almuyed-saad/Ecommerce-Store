@@ -1,7 +1,6 @@
 // src/api/client.js
 import axios from 'axios'
 
-// ✅ PERMANENT FIX: Use Render URL directly
 const API_BASE_URL = 'https://ecommerce-store-6dlf.onrender.com/api'
 
 const apiClient = axios.create({
@@ -11,6 +10,18 @@ const apiClient = axios.create({
   },
 })
 
-console.log('🔍 API Client initialized with URL:', API_BASE_URL)
+// ✅ INTERCEPTOR: Attach token to EVERY request automatically
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
 export default apiClient
