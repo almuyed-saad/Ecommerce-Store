@@ -4,7 +4,7 @@ import { useWishlist } from '../../context/WishlistContext'
 
 const ProductCard = ({ product }) => {
   const { addToCart } = useCart()
-  const { addToWishlist, isInWishlist } = useWishlist()
+  const { toggleWishlist, isInWishlist } = useWishlist()  // ✅ Changed from addToWishlist to toggleWishlist
 
   if (!product) return null
   const productId = product._id || product.id
@@ -24,7 +24,7 @@ const ProductCard = ({ product }) => {
 
         {/* Wishlist Button */}
         <button
-          onClick={() => addToWishlist(product)}
+          onClick={() => toggleWishlist(product)}  // ✅ Changed from addToWishlist to toggleWishlist
           className="absolute top-3 right-3 w-8 h-8 bg-white/90 dark:bg-dark-surface/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform select-none cursor-pointer"
           aria-label="Add to wishlist"
         >

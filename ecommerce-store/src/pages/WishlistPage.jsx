@@ -9,6 +9,9 @@ const WishlistPage = () => {
   const { wishlist, removeFromWishlist } = useWishlist()
   const { addToCart, addToCartSilent, cart } = useCart()
 
+  // ✅ wishlist is now: { products: [...] }
+  const wishlistItems = wishlist?.products || []
+
   const getProductId = (product) => {
     const id = product?._id || product?.id
     return id ? String(id) : null
@@ -25,14 +28,14 @@ const WishlistPage = () => {
   }
 
   const handleAddAllToCart = () => {
-    if (!wishlist.length) return toast.error('Your wishlist is empty')
+    if (!wishlistItems.length) return toast.error('Your wishlist is empty')
 
-    const alreadyInCart = wishlist.filter((p) => {
+    const alreadyInCart = wishlistItems.filter((p) => {
       const pid = getProductId(p)
       return cart.some(item => String(item._id || item.id) === pid)
     })
 
-    const newItems = wishlist.filter((p) => {
+    const newItems = wishlistItems.filter((p) => {
       const pid = getProductId(p)
       return !cart.some(item => String(item._id || item.id) === pid)
     })
@@ -43,11 +46,12 @@ const WishlistPage = () => {
 
     const msg = alreadyInCart.length
       ? `✅ Added ${newItems.length} new items (${alreadyInCart.length} were already in cart)`
-      : `✅ Added all ${wishlist.length} items to cart! 🎉`
+      : `✅ Added all ${wishlistItems.length} items to cart! 🎉`
     toast.success(msg)
   }
 
-  if (!wishlist.length) {
+  // ✅ Empty state
+  if (!wishlistItems.length) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -82,7 +86,7 @@ const WishlistPage = () => {
             ❤️ My Wishlist
           </h1>
           <p className="text-light-text-secondary dark:text-dark-text-secondary mt-1">
-            {wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} saved
+            {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} saved
           </p>
         </div>
         <Ripple
@@ -96,7 +100,7 @@ const WishlistPage = () => {
 
       <div className="space-y-4">
         <AnimatePresence mode="popLayout">
-          {wishlist.map((product, index) => {
+          {wishlistItems.map((product, index) => {
             const id = getProductId(product) || `item-${index}`
             return (
               <motion.div
@@ -171,7 +175,7 @@ const WishlistPage = () => {
         className="mt-8 flex flex-wrap justify-between items-center gap-4 p-4 bg-light-surface dark:bg-dark-card rounded-2xl border border-light-border dark:border-dark-border"
       >
         <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary">
-          {wishlist.length} {wishlist.length === 1 ? 'item' : 'items'} in your wishlist
+          {wishlistItems.length} {wishlistItems.length === 1 ? 'item' : 'items'} in your wishlist
         </span>
         <div className="flex gap-3">
           <Ripple
@@ -185,7 +189,7 @@ const WishlistPage = () => {
             className="px-6 py-2 bg-red-50 dark:bg-red-900/20 text-red-500 rounded-xl font-semibold hover:bg-red-100 dark:hover:bg-red-900/40 transition-all select-none cursor-pointer"
             onClick={() => {
               if (window.confirm('Remove all items from wishlist?')) {
-                wishlist.forEach(p => removeFromWishlist(getProductId(p)))
+                wishlistItems.forEach(p => removeFromWishlist(getProductId(p)))
                 toast.success('Wishlist cleared')
               }
             }}
