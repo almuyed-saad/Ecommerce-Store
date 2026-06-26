@@ -1,8 +1,8 @@
 // src/api/client.js
 import axios from 'axios'
 
-// ✅ Use environment variable for production, fallback to localhost for development
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
+// ✅ PERMANENT FIX: Use Render URL directly
+const API_BASE_URL = 'https://ecommerce-store-6dlf.onrender.com/api'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -10,5 +10,7 @@ const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 })
+
+console.log('🔍 API Client initialized with URL:', API_BASE_URL)
 
 export default apiClient
