@@ -18,12 +18,16 @@ export const AuthProvider = ({ children }) => {
   // Load user on mount
   useEffect(() => {
     const loadUser = async () => {
-      if (!token) {
+      const savedToken = localStorage.getItem('token')
+      if (!savedToken) {
         setLoading(false)
         return
       }
 
       try {
+        setToken(savedToken)
+        axios.defaults.headers.common['Authorization'] = `Bearer ${savedToken}`
+        
         const response = await apiClient.get('/auth/profile')
         setUser(response.data)
       } catch (error) {
@@ -36,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     loadUser()
-  }, [token])
+  }, [])
 
   // Register
   const register = async (name, email, password) => {
@@ -88,7 +92,14 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      login, 
+      register, 
+      logout, 
+      isAuthenticated: !!user 
+    }}>
       {children}
     </AuthContext.Provider>
   )
