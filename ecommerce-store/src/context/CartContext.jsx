@@ -6,17 +6,16 @@ import { useAuth } from './AuthContext'
 const CartContext = createContext()
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState({ items: [] })
+  const [cart, setCart] = useState({ items: [] })  // ✅ cart is an OBJECT
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
 
-  // Load cart from database when user logs in
   useEffect(() => {
     const loadCart = async () => {
       if (user) {
         try {
           const data = await cartService.getCart()
-          setCart(data)
+          setCart(data)  // ✅ data is { items: [...] }
         } catch (error) {
           console.error('Error loading cart:', error)
         }
@@ -64,22 +63,21 @@ export const CartProvider = ({ children }) => {
   }
 
   const clearCart = async () => {
-    // Optional: implement clear cart endpoint
     setCart({ items: [] })
     toast.success('Cart cleared')
   }
 
   const getTotalItems = () => {
-    return cart.items?.reduce((total, item) => total + item.quantity, 0) || 0
+    return cart.items?.reduce((total, item) => total + item.quantity, 0) || 0  // ✅ use cart.items
   }
 
   const getTotalPrice = () => {
-    return cart.items?.reduce((total, item) => total + (item.product?.price || 0) * item.quantity, 0) || 0
+    return cart.items?.reduce((total, item) => total + (item.product?.price || 0) * item.quantity, 0) || 0  // ✅ use cart.items
   }
 
   return (
     <CartContext.Provider value={{
-      cart,
+      cart: cart.items || [],  // ✅ Provide cart.items as the array
       loading,
       addToCart,
       updateQuantity,
