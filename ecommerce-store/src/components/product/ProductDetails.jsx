@@ -14,7 +14,7 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true)
   const [quantity, setQuantity] = useState(1)
   const { addToCart } = useCart()
-  const { addToWishlist, isInWishlist } = useWishlist()
+  const { toggleWishlist, isInWishlist } = useWishlist()
 
     useEffect(() => {
     if (!loading && product) {
@@ -178,27 +178,28 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Action Buttons */}
-          <div className="flex flex-wrap gap-4">
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={handleAddToCart}
-              className="flex-1 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all"
-            >
-              🛒 Add to Cart
-            </motion.button>
+{/* Action Buttons */}
+<div className="flex flex-wrap gap-4">
+  <motion.button
+    whileHover={{ scale: 1.03 }}
+    whileTap={{ scale: 0.97 }}
+    onClick={handleAddToCart}
+    className="flex-1 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-2xl font-semibold shadow-lg hover:shadow-xl transition-all"
+  >
+    🛒 Add to Cart
+  </motion.button>
 
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => addToWishlist(product)}
-              className="px-6 py-4 bg-white dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-2xl font-semibold hover:border-primary-600 dark:hover:border-primary-400 transition-all flex items-center gap-2"
-            >
-              {isInWishlist(product.id) ? '❤️' : '🤍'}
-              <span className="hidden sm:inline">Wishlist</span>
-            </motion.button>
-          </div>
+  {/* ✅ FIXED: Wishlist Button */}
+  <motion.button
+    whileHover={{ scale: 1.03 }}
+    whileTap={{ scale: 0.97 }}
+    onClick={() => toggleWishlist(product)}  // ← toggleWishlist, not addToWishlist
+    className="px-6 py-4 bg-white dark:bg-dark-surface border-2 border-light-border dark:border-dark-border rounded-2xl font-semibold hover:border-primary-600 dark:hover:border-primary-400 transition-all flex items-center gap-2"
+  >
+    {isInWishlist(product._id) ? '❤️' : '🤍'}
+    <span className="hidden sm:inline">Wishlist</span>
+  </motion.button>
+</div>
 
           {/* Divider */}
           <div className="h-px bg-gradient-to-r from-primary-500 via-secondary-500 to-transparent my-6" />
