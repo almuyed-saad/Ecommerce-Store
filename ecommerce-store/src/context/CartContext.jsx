@@ -6,7 +6,7 @@ import { useAuth } from './AuthContext'
 const CartContext = createContext()
 
 export const CartProvider = ({ children }) => {
-  const [cart, setCart] = useState({ items: [] })  // ✅ cart is an OBJECT
+  const [cartData, setCartData] = useState({ items: [] })
   const [loading, setLoading] = useState(true)
   const { user } = useAuth()
 
@@ -15,12 +15,13 @@ export const CartProvider = ({ children }) => {
       if (user) {
         try {
           const data = await cartService.getCart()
-          setCart(data)  // ✅ data is { items: [...] }
+          setCartData(data)
         } catch (error) {
           console.error('Error loading cart:', error)
+          setCartData({ items: [] })
         }
       } else {
-        setCart({ items: [] })
+        setCartData({ items: [] })
       }
       setLoading(false)
     }
@@ -36,9 +37,10 @@ export const CartProvider = ({ children }) => {
     try {
       const productId = product._id || product.id
       const data = await cartService.addToCart(productId, quantity)
-      setCart(data)
+      setCartData(data)
       toast.success(`Added ${product.title} to cart 🛒`)
     } catch (error) {
+      console.error('Add to cart error:', error)
       toast.error('Failed to add to cart')
     }
   }
@@ -46,8 +48,9 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = async (productId, quantity) => {
     try {
       const data = await cartService.updateCartItem(productId, quantity)
-      setCart(data)
+      setCartData(data)
     } catch (error) {
+      console.error('Update quantity error:', error)
       toast.error('Failed to update cart')
     }
   }
@@ -55,29 +58,36 @@ export const CartProvider = ({ children }) => {
   const removeFromCart = async (productId) => {
     try {
       const data = await cartService.removeFromCart(productId)
-      setCart(data)
+      setCartData(data)
       toast.success('Removed from cart')
     } catch (error) {
+      console.error('Remove from cart error:', error)
       toast.error('Failed to remove from cart')
     }
   }
 
   const clearCart = async () => {
-    setCart({ items: [] })
+    setCartData({ items: [] })
     toast.success('Cart cleared')
   }
 
+  // ✅ Returns the ITEMS array (what CartPage expects)
+  const cart = cartData.items || []
+
   const getTotalItems = () => {
-    return cart.items?.reduce((total, item) => total + item.quantity, 0) || 0  // ✅ use cart.items
+    return cart.reduce((total, item) => total + (item.quantity || 0), 0)
   }
 
   const getTotalPrice = () => {
-    return cart.items?.reduce((total, item) => total + (item.product?.price || 0) * item.quantity, 0) || 0  // ✅ use cart.items
+    return cart.reduce((total, item) => {
+      const price = item.product?.price || item.price || 0
+      return total + (price * (item.quantity || 0))
+    }, 0)
   }
 
   return (
     <CartContext.Provider value={{
-      cart: cart.items || [],  // ✅ Provide cart.items as the array
+      cart,           // ✅ This is the array CartPage expects
       loading,
       addToCart,
       updateQuantity,
