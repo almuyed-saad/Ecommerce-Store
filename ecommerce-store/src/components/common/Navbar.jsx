@@ -101,19 +101,18 @@ const Navbar = () => {
                 <span className="text-xl">{theme === 'dark' ? '🌙' : '☀️'}</span>
               </button>
 
-              {/* Wishlist */}
-              <Link
-                to="/wishlist"
-                className="p-2 rounded-full hover:bg-light-card dark:hover:bg-dark-card transition-colors relative"
-                aria-label="Wishlist"
-              >
-                <span className="text-xl">❤️</span>
-                {wishlist.length > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-secondary-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse-slow">
-                    {wishlist.length}
-                  </span>
-                )}
-              </Link>
+<Link
+  to="/wishlist"
+  className="p-2 rounded-full hover:bg-light-card dark:hover:bg-dark-card transition-colors relative"
+  aria-label="Wishlist"
+>
+  <span className="text-xl">❤️</span>
+  {wishlist.products?.length > 0 && (
+    <span className="absolute -top-0.5 -right-0.5 w-5 h-5 bg-secondary-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse-slow">
+      {wishlist.products.length}
+    </span>
+  )}
+</Link>
 
               {/* Cart */}
               <Link
