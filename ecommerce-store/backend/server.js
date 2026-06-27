@@ -14,6 +14,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ✅ Add this — Welcome message for API root
+app.get('/api', (req, res) => {
+  res.json({
+    message: '🚀 API is running!',
+    endpoints: [
+      '/api/products',
+      '/api/auth',
+      '/api/cart',
+      '/api/wishlist',
+      '/api/users',
+      '/api/orders'
+    ]
+  });
+});
+
 // Routes
 app.use('/api/products', require('./routes/products'));
 app.use('/api/auth', require('./routes/auth'));
