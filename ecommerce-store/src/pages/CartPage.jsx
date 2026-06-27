@@ -89,119 +89,127 @@ const CartPage = () => {
         {/* Left: Cart Items */}
         <div className="lg:col-span-2 space-y-4">
           <AnimatePresence mode="popLayout">
-            {cart.map((item, index) => (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: -50, scale: 0.9 }}
-                transition={{ 
-                  duration: 0.3, 
-                  delay: index * 0.05,
-                  layout: { duration: 0.3 }
-                }}
-                className="bg-white dark:bg-dark-surface rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-light-border dark:border-dark-border"
-              >
-                <div className="flex flex-col sm:flex-row items-center gap-4 p-4 md:p-6">
-                  {/* Product Image */}
-                  <Link to={`/product/${item.id}`} className="flex-shrink-0">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-24 h-24 md:w-28 md:h-28 object-contain bg-light-surface dark:bg-dark-card rounded-xl p-2 hover:scale-105 transition-transform duration-300"
-                      loading="lazy"
-                    />
-                  </Link>
-
-                  {/* Product Details */}
-                  <div className="flex-1 w-full">
-                    <Link to={`/product/${item.id}`}>
-                      <h3 className="text-sm md:text-base font-semibold text-dark-bg dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors line-clamp-2">
-                        {item.title}
-                      </h3>
+            {cart.map((item, index) => {
+              // ✅ Use item._id for React key (cart subdocument ID)
+              // ✅ Use item.product._id for API calls
+              const product = item.product
+              const productId = product?._id
+              
+              return (
+                <motion.div
+                  key={item._id}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, x: -50, scale: 0.9 }}
+                  transition={{ 
+                    duration: 0.3, 
+                    delay: index * 0.05,
+                    layout: { duration: 0.3 }
+                  }}
+                  className="bg-white dark:bg-dark-surface rounded-2xl shadow-md hover:shadow-xl transition-all overflow-hidden border border-light-border dark:border-dark-border"
+                >
+                  <div className="flex flex-col sm:flex-row items-center gap-4 p-4 md:p-6">
+                    {/* ✅ Product Image (using product data) */}
+                    <Link to={`/product/${productId}`} className="flex-shrink-0">
+                      <img
+                        src={product.image}
+                        alt={product.title}
+                        className="w-24 h-24 md:w-28 md:h-28 object-contain bg-light-surface dark:bg-dark-card rounded-xl p-2 hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
                     </Link>
 
-                    {/* Rating */}
-                    <div className="flex items-center gap-2 mt-1">
-                      <div className="flex text-yellow-400 text-xs">
-                        {'★'.repeat(Math.round(item.rating?.rate || 0))}
-                        {'☆'.repeat(5 - Math.round(item.rating?.rate || 0))}
-                      </div>
-                      <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
-                        ({item.rating?.count || 0})
-                      </span>
-                    </div>
+                    {/* Product Details */}
+                    <div className="flex-1 w-full">
+                      <Link to={`/product/${productId}`}>
+                        <h3 className="text-sm md:text-base font-semibold text-dark-bg dark:text-white hover:text-primary-600 dark:hover:text-primary-400 transition-colors line-clamp-2">
+                          {product.title}
+                        </h3>
+                      </Link>
 
-                    {/* Price & Quantity */}
-                    <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
-                      <div>
-                        <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
-                          ${item.price}
+                      {/* ✅ Rating (using product data) */}
+                      <div className="flex items-center gap-2 mt-1">
+                        <div className="flex text-yellow-400 text-xs">
+                          {'★'.repeat(Math.round(product.rating?.rate || 0))}
+                          {'☆'.repeat(5 - Math.round(product.rating?.rate || 0))}
+                        </div>
+                        <span className="text-xs text-light-text-secondary dark:text-dark-text-secondary">
+                          ({product.rating?.count || 0})
                         </span>
-                        {item.quantity > 1 && (
-                          <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary ml-2">
-                            × {item.quantity}
-                          </span>
-                        )}
                       </div>
 
-                      <div className="flex items-center gap-3">
-{/* Quantity Controls with Ripple */}
-<div className="flex items-center gap-1 bg-light-surface dark:bg-dark-card rounded-full p-1">
-  <Ripple 
-    className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold text-dark-bg dark:text-white hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-300 hover:text-red-500 hover:scale-110 select-none cursor-pointer"
-    onClick={() => {
-      const id = item._id || item.id
-      if (item.quantity <= 1) {
-        removeFromCart(id)
-      } else {
-        updateQuantity(id, item.quantity - 1)
-      }
-    }}
-    rippleColor="rgba(239,68,68,0.3)"
-  >
-    −
-  </Ripple>
-  
-  <span className="w-8 text-center font-semibold text-dark-bg dark:text-white select-none">
-    {item.quantity}
-  </span>
-  
-  <Ripple 
-    className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold text-dark-bg dark:text-white hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-all duration-300 hover:text-primary-600 hover:scale-110 select-none cursor-pointer"
-    onClick={() => {
-      const id = item._id || item.id
-      updateQuantity(id, item.quantity + 1)
-    }}
-    rippleColor="rgba(124,58,237,0.3)"
-  >
-    +
-  </Ripple>
-</div>
+                      {/* Price & Quantity */}
+                      <div className="flex flex-wrap items-center justify-between gap-3 mt-3">
+                        <div>
+                          {/* ✅ Price (using product data) */}
+                          <span className="text-lg font-bold text-primary-600 dark:text-primary-400">
+                            ${product.price}
+                          </span>
+                          {item.quantity > 1 && (
+                            <span className="text-sm text-light-text-secondary dark:text-dark-text-secondary ml-2">
+                              × {item.quantity}
+                            </span>
+                          )}
+                        </div>
 
-{/* Subtotal */}
-<span className="text-sm font-semibold text-dark-bg dark:text-white min-w-[60px] text-right select-none">
-  ${(item.price * item.quantity).toFixed(2)}
-</span>
+                        <div className="flex items-center gap-3">
+                          {/* Quantity Controls */}
+                          <div className="flex items-center gap-1 bg-light-surface dark:bg-dark-card rounded-full p-1">
+                            <Ripple 
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold text-dark-bg dark:text-white hover:bg-red-100 dark:hover:bg-red-900/30 transition-all duration-300 hover:text-red-500 hover:scale-110 select-none cursor-pointer"
+                              onClick={() => {
+                                // ✅ Use productId for API calls
+                                if (item.quantity <= 1) {
+                                  removeFromCart(productId)
+                                } else {
+                                  updateQuantity(productId, item.quantity - 1)
+                                }
+                              }}
+                              rippleColor="rgba(239,68,68,0.3)"
+                            >
+                              −
+                            </Ripple>
+                            
+                            <span className="w-8 text-center font-semibold text-dark-bg dark:text-white select-none">
+                              {item.quantity}
+                            </span>
+                            
+                            <Ripple 
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-lg font-bold text-dark-bg dark:text-white hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-all duration-300 hover:text-primary-600 hover:scale-110 select-none cursor-pointer"
+                              onClick={() => {
+                                // ✅ Use productId for API calls
+                                updateQuantity(productId, item.quantity + 1)
+                              }}
+                              rippleColor="rgba(124,58,237,0.3)"
+                            >
+                              +
+                            </Ripple>
+                          </div>
 
-{/* Remove with Ripple */}
-<Ripple 
-  className="text-red-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 p-2 rounded-full hover:scale-110 select-none cursor-pointer"
-  onClick={() => {
-    const id = item._id || item.id
-    removeFromCart(id)
-  }}
-  rippleColor="rgba(239,68,68,0.3)"
->
-  ✕
-</Ripple>
+                          {/* ✅ Subtotal (using product data) */}
+                          <span className="text-sm font-semibold text-dark-bg dark:text-white min-w-[60px] text-right select-none">
+                            ${(product.price * item.quantity).toFixed(2)}
+                          </span>
+
+                          {/* Remove with Ripple */}
+                          <Ripple 
+                            className="text-red-300 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all duration-300 p-2 rounded-full hover:scale-110 select-none cursor-pointer"
+                            onClick={() => {
+                              // ✅ Use productId for API calls
+                              removeFromCart(productId)
+                            }}
+                            rippleColor="rgba(239,68,68,0.3)"
+                          >
+                            ✕
+                          </Ripple>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              )
+            })}
           </AnimatePresence>
         </div>
 
@@ -285,16 +293,17 @@ const CartPage = () => {
               </div>
             </div>
 
-<Link to="/checkout">
-  <motion.button
-    whileHover={{ scale: 1.02 }}
-    whileTap={{ scale: 0.98 }}
-    className="w-full mt-6 py-4 bg-gradient-to-r from-gold-400 to-yellow-400 text-black font-bold rounded-xl shadow-lg hover:shadow-gold-500/30 transition-all flex items-center justify-center gap-2"
-  >
-    Proceed to Checkout
-    <span className="group-hover:translate-x-1 transition-transform">→</span>
-  </motion.button>
-</Link>
+            <Link to="/checkout">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full mt-6 py-4 bg-gradient-to-r from-gold-400 to-yellow-400 text-black font-bold rounded-xl shadow-lg hover:shadow-gold-500/30 transition-all flex items-center justify-center gap-2"
+              >
+                Proceed to Checkout
+                <span className="group-hover:translate-x-1 transition-transform">→</span>
+              </motion.button>
+            </Link>
+
             {/* Secure Checkout Badge */}
             <div className="mt-4 text-center">
               <div className="flex items-center justify-center gap-3 text-xs text-light-text-secondary dark:text-dark-text-secondary">
